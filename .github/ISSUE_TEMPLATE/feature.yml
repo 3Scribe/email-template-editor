@@ -44,6 +44,12 @@ body:
     attributes:
       label: How to Test
 
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes
+      description: Additional implementation notes or constraints.
+
   - type: markdown
     attributes:
       value: |
