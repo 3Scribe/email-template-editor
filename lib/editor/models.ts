@@ -1,6 +1,8 @@
 export type ComponentSettingType =
   | "text"
+  | "color"
   | "number"
+  | "url"
   | "boolean"
   | "select"
   | "image";
@@ -22,20 +24,28 @@ export type ComponentSetting = {
 
 export type TemplateInstance = {
   id: string;
-  componentType: string;
-  props: Record<string, unknown>;
+  componentId: string;
+  overrides: Record<string, unknown>;
+  componentType?: string;
+  props?: Record<string, unknown>;
   children?: TemplateInstance[];
 };
 
 export type ComponentDefinition = {
-  type: string;
-  displayName: string;
-  defaultProps: Record<string, unknown>;
+  id: string;
+  name: string;
+  description: string;
+  html: string;
+  defaults: Record<string, unknown>;
   settings: ComponentSetting[];
+  type?: string;
+  displayName?: string;
+  defaultProps?: Record<string, unknown>;
 };
 
 export type TemplateDocument = {
   id: string;
   name: string;
-  root: TemplateInstance[];
+  instances: TemplateInstance[];
+  root?: TemplateInstance[];
 };

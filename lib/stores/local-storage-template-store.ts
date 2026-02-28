@@ -15,11 +15,16 @@ function isTemplateInstance(value: unknown): value is TemplateInstance {
     return false;
   }
 
-  if (
-    typeof value.id !== "string" ||
-    typeof value.componentType !== "string" ||
-    !isRecord(value.props)
-  ) {
+  if (typeof value.id !== "string") {
+    return false;
+  }
+
+  const hasNewShape =
+    typeof value.componentId === "string" && isRecord(value.overrides);
+  const hasLegacyShape =
+    typeof value.componentType === "string" && isRecord(value.props);
+
+  if (!hasNewShape && !hasLegacyShape) {
     return false;
   }
 
@@ -39,15 +44,21 @@ function isTemplateDocument(value: unknown): value is TemplateDocument {
     return false;
   }
 
-  if (
-    typeof value.id !== "string" ||
-    typeof value.name !== "string" ||
-    !Array.isArray(value.root)
-  ) {
+  if (typeof value.id !== "string" || typeof value.name !== "string") {
     return false;
   }
 
-  return value.root.every(isTemplateInstance);
+  const instances = Array.isArray(value.instances)
+    ? value.instances
+    : Array.isArray(value.root)
+      ? value.root
+      : null;
+
+  if (!instances) {
+    return false;
+  }
+
+  return instances.every(isTemplateInstance);
 }
 
 function isTemplateListItem(value: unknown): value is TemplateListItem {
@@ -80,6 +91,27 @@ function createTemplateId(): string {
   }
 
   return `${Date.now()}-${Math.floor(Math.random() * 1_000_000)}`;
+}
+
+function normalizeInstance(instance: TemplateInstance): TemplateInstance {
+  return {
+    ...instance,
+    componentId: instance.componentId ?? instance.componentType ?? "",
+    overrides: instance.overrides ?? instance.props ?? {}
+  };
+}
+
+function normalizeDocument(doc: TemplateDocument): TemplateDocument {
+  const instances = Array.isArray(doc.instances)
+    ? doc.instances
+    : Array.isArray(doc.root)
+      ? doc.root
+      : [];
+
+  return {
+    ...doc,
+    instances: instances.map(normalizeInstance)
+  };
 }
 
 export class LocalStorageTemplateStore implements TemplateStore {
@@ -125,7 +157,7 @@ export class LocalStorageTemplateStore implements TemplateStore {
       return null;
     }
 
-    return parsed;
+    return normalizeDocument(parsed);
   }
 
   async list(): Promise<TemplateListItem[]> {
@@ -154,7 +186,7 @@ export class LocalStorageTemplateStore implements TemplateStore {
     const doc: TemplateDocument = {
       id: createTemplateId(),
       name: name?.trim() || "Untitled Template",
-      root: []
+      instances: []
     };
 
     await this.save(doc);
@@ -167,11 +199,12 @@ export class LocalStorageTemplateStore implements TemplateStore {
       return;
     }
 
-    storage.setItem(templateKey(doc.id), JSON.stringify(doc));
+    const normalizedDoc = normalizeDocument(doc);
+    storage.setItem(templateKey(doc.id), JSON.stringify(normalizedDoc));
 
     const nextEntry: TemplateListItem = {
-      id: doc.id,
-      name: doc.name,
+      id: normalizedDoc.id,
+      name: normalizedDoc.name,
       updatedAt: new Date().toISOString()
     };
 
