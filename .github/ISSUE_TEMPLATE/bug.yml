@@ -1,0 +1,59 @@
+name: Bug Report
+description: Report something that is not working correctly
+title: "bug: "
+labels:
+  - bug
+
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Clearly describe the problem.
+      placeholder: What happened?
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Reproduce
+      description: Provide step-by-step instructions.
+      placeholder: |
+        1. Go to...
+        2. Click...
+        3. Observe error...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behaviour
+      description: What should have happened?
+    validations:
+      required: true
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots / Logs
+      description: Paste screenshots, console errors, or logs if available.
+
+  - type: dropdown
+    id: environment
+    attributes:
+      label: Environment
+      options:
+        - Windows
+        - macOS
+        - Linux
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: Anything else that may help diagnose the issue.
