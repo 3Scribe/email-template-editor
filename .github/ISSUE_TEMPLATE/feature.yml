@@ -34,3 +34,11 @@ body:
     id: testing
     attributes:
       label: How to Test
+
+  - type: markdown
+    attributes:
+      value: |
+        ### Implementation Guidance
+        - Keep changes incremental.
+        - Maintain a working application state throughout implementation.
+        - If implementation becomes large, complete the work in logical stages rather than one large change.
