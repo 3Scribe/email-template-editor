@@ -13,4 +13,17 @@ Execution Rules:
   2. List manual testing steps
   3. Identify any follow-up work
 
+## Commit message format (required)
+
+- Use Conventional Commits: <type>: <short summary>
+- Always include the GitHub issue number in parentheses at the end of the subject.
+
+Examples:
+- feat: add localStorage template store (#2)
+- fix: escape text placeholders in renderer (#12)
+- chore: add issue form guidance (#5)
+
+If multiple issues are involved, reference the main one in the subject and list others in the body as:
+Refs #3, #4
+
 Work incrementally and safely.

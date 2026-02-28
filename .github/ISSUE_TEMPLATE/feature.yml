@@ -5,6 +5,15 @@ labels:
   - feature
 
 body:
+  - type: input
+    id: issue_number
+    attributes:
+      label: Issue number
+      description: The GitHub issue number (e.g. 2)
+      placeholder: "2"
+    validations:
+      required: true
+
   - type: textarea
     id: goal
     attributes:
