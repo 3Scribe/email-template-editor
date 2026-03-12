@@ -23,6 +23,7 @@ export default function TemplatesPage() {
 
   const [templates, setTemplates] = useState<TemplateListItem[]>([]);
   const [creating, setCreating] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const loadTemplates = useCallback(async () => {
     const items = await store.list();
@@ -45,6 +46,31 @@ export default function TemplatesPage() {
     }
   }, [loadTemplates, router, store]);
 
+  const handleOpen = useCallback(
+    (templateId: string) => {
+      router.push(`/editor/${templateId}`);
+    },
+    [router]
+  );
+
+  const handleDelete = useCallback(
+    async (template: TemplateListItem) => {
+      if (!window.confirm(`Delete template \"${template.name}\"?`)) {
+        return;
+      }
+
+      setDeletingId(template.id);
+
+      try {
+        await store.remove(template.id);
+        await loadTemplates();
+      } finally {
+        setDeletingId(null);
+      }
+    },
+    [loadTemplates, store]
+  );
+
   return (
     <main style={{ padding: "2rem" }}>
       <h1>Templates</h1>
@@ -55,11 +81,31 @@ export default function TemplatesPage() {
       {templates.length === 0 ? (
         <p style={{ marginTop: "1rem" }}>No templates yet.</p>
       ) : (
-        <ul style={{ marginTop: "1rem" }}>
+        <ul style={{ marginTop: "1rem", padding: 0, listStyle: "none", display: "grid", gap: "0.75rem" }}>
           {templates.map((template) => (
-            <li key={template.id}>
-              <strong>{template.name}</strong> ({template.id}) - updated{" "}
-              {formatUpdatedAt(template.updatedAt)}
+            <li
+              key={template.id}
+              style={{ border: "1px solid #ddd", borderRadius: "6px", padding: "0.75rem" }}
+            >
+              <p style={{ margin: 0 }}>
+                <strong>{template.name}</strong>
+              </p>
+              <p style={{ margin: "0.35rem 0", color: "#555", fontSize: "0.9rem" }}>
+                ID: {template.id}
+              </p>
+              <p style={{ margin: 0, color: "#555", fontSize: "0.9rem" }}>
+                Updated {formatUpdatedAt(template.updatedAt)}
+              </p>
+
+              <div style={{ display: "flex", gap: "0.5rem", marginTop: "0.75rem" }}>
+                <button onClick={() => handleOpen(template.id)}>Open</button>
+                <button
+                  onClick={() => void handleDelete(template)}
+                  disabled={deletingId === template.id}
+                >
+                  {deletingId === template.id ? "Deleting..." : "Delete"}
+                </button>
+              </div>
             </li>
           ))}
         </ul>
