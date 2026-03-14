@@ -360,6 +360,27 @@ export default function EditorPage() {
     setSaveState("idle");
   }, []);
 
+  const componentNameById = useMemo(
+    () => new Map(components.map((component) => [component.id, component.name])),
+    [components]
+  );
+
+  const confirmDeleteInstance = useCallback(
+    (instance: TemplateInstance, index: number) => {
+      const componentName = componentNameById.get(instance.componentId) ?? instance.componentId;
+      const shouldDelete = window.confirm(
+        `Delete component ${index + 1}: ${componentName}?`
+      );
+
+      if (!shouldDelete) {
+        return;
+      }
+
+      handleDeleteInstance(instance.id);
+    },
+    [componentNameById, handleDeleteInstance]
+  );
+
   const handleDuplicateInstance = useCallback((instanceId: string) => {
     const nextInstanceId = createInstanceId();
 
@@ -449,7 +470,6 @@ export default function EditorPage() {
     ? getComponentDefaults(selectedComponent)
     : {};
 
-  const componentNameById = new Map(components.map((component) => [component.id, component.name]));
 
   return (
     <main style={{ padding: "1rem" }}>
@@ -572,7 +592,9 @@ export default function EditorPage() {
                       <button onClick={() => handleDuplicateInstance(instance.id)}>
                         Duplicate
                       </button>
-                      <button onClick={() => handleDeleteInstance(instance.id)}>Delete</button>
+                      <button onClick={() => confirmDeleteInstance(instance, index)}>
+                        Delete
+                      </button>
                     </div>
                   </div>
                 </li>
