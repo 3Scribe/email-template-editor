@@ -293,6 +293,73 @@ export default function EditorPage() {
     [selectedComponent, selectedInstanceId]
   );
 
+  const handleMoveInstance = useCallback(
+    (instanceId: string, direction: "up" | "down") => {
+      setDoc((previous) => {
+        if (!previous) {
+          return previous;
+        }
+
+        const index = previous.instances.findIndex((instance) => instance.id === instanceId);
+        if (index < 0) {
+          return previous;
+        }
+
+        const targetIndex = direction === "up" ? index - 1 : index + 1;
+        if (targetIndex < 0 || targetIndex >= previous.instances.length) {
+          return previous;
+        }
+
+        const nextInstances = [...previous.instances];
+        const [moved] = nextInstances.splice(index, 1);
+        nextInstances.splice(targetIndex, 0, moved);
+
+        return {
+          ...previous,
+          instances: nextInstances
+        };
+      });
+
+      setSaveState("idle");
+    },
+    []
+  );
+
+  const handleDeleteInstance = useCallback((instanceId: string) => {
+    setDoc((previous) => {
+      if (!previous) {
+        return previous;
+      }
+
+      const index = previous.instances.findIndex((instance) => instance.id === instanceId);
+      if (index < 0) {
+        return previous;
+      }
+
+      const nextInstances = previous.instances.filter((instance) => instance.id !== instanceId);
+
+      setSelectedInstanceId((current) => {
+        if (current !== instanceId) {
+          return current;
+        }
+
+        if (nextInstances.length === 0) {
+          return null;
+        }
+
+        const fallbackIndex = Math.min(index, nextInstances.length - 1);
+        return nextInstances[fallbackIndex].id;
+      });
+
+      return {
+        ...previous,
+        instances: nextInstances
+      };
+    });
+
+    setSaveState("idle");
+  }, []);
+
   const handleSave = useCallback(async () => {
     if (!doc) {
       return;
@@ -426,25 +493,45 @@ export default function EditorPage() {
             <p>No components added yet.</p>
           ) : (
             <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "grid", gap: "0.5rem" }}>
-              {doc.instances.map((instance) => (
+              {doc.instances.map((instance, index) => (
                 <li key={instance.id}>
-                  <button
-                    onClick={() => setSelectedInstanceId(instance.id)}
-                    style={{
-                      width: "100%",
-                      textAlign: "left",
-                      padding: "0.5rem",
-                      borderRadius: "4px",
-                      border:
-                        instance.id === selectedInstanceId
-                          ? "2px solid #2563eb"
-                          : "1px solid #d4d4d4",
-                      background:
-                        instance.id === selectedInstanceId ? "#eff6ff" : "#fff"
-                    }}
-                  >
-                    {instance.componentId} ({instance.id})
-                  </button>
+                  <div style={{ display: "grid", gap: "0.35rem" }}>
+                    <button
+                      onClick={() => setSelectedInstanceId(instance.id)}
+                      style={{
+                        width: "100%",
+                        textAlign: "left",
+                        padding: "0.5rem",
+                        borderRadius: "4px",
+                        border:
+                          instance.id === selectedInstanceId
+                            ? "2px solid #2563eb"
+                            : "1px solid #d4d4d4",
+                        background:
+                          instance.id === selectedInstanceId ? "#eff6ff" : "#fff"
+                      }}
+                    >
+                      {instance.componentId} ({instance.id})
+                    </button>
+
+                    <div style={{ display: "flex", gap: "0.35rem" }}>
+                      <button
+                        onClick={() => handleMoveInstance(instance.id, "up")}
+                        disabled={index === 0}
+                        style={{ flex: 1 }}
+                      >
+                        Move Up
+                      </button>
+                      <button
+                        onClick={() => handleMoveInstance(instance.id, "down")}
+                        disabled={index === doc.instances.length - 1}
+                        style={{ flex: 1 }}
+                      >
+                        Move Down
+                      </button>
+                      <button onClick={() => handleDeleteInstance(instance.id)}>Delete</button>
+                    </div>
+                  </div>
                 </li>
               ))}
             </ul>
