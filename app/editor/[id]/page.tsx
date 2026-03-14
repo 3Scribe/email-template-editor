@@ -360,6 +360,27 @@ export default function EditorPage() {
     setSaveState("idle");
   }, []);
 
+  const componentNameById = useMemo(
+    () => new Map(components.map((component) => [component.id, component.name])),
+    [components]
+  );
+
+  const confirmDeleteInstance = useCallback(
+    (instance: TemplateInstance, index: number) => {
+      const componentName = componentNameById.get(instance.componentId) ?? instance.componentId;
+      const shouldDelete = window.confirm(
+        `Delete component ${index + 1}: ${componentName}?`
+      );
+
+      if (!shouldDelete) {
+        return;
+      }
+
+      handleDeleteInstance(instance.id);
+    },
+    [componentNameById, handleDeleteInstance]
+  );
+
   const handleDuplicateInstance = useCallback((instanceId: string) => {
     const nextInstanceId = createInstanceId();
 
@@ -390,6 +411,27 @@ export default function EditorPage() {
     });
 
     setSelectedInstanceId(nextInstanceId);
+    setSaveState("idle");
+  }, []);
+
+  const handleClearCanvas = useCallback(() => {
+    const shouldClear = window.confirm("Delete all components from the canvas?");
+    if (!shouldClear) {
+      return;
+    }
+
+    setDoc((previous) => {
+      if (!previous || previous.instances.length === 0) {
+        return previous;
+      }
+
+      return {
+        ...previous,
+        instances: []
+      };
+    });
+
+    setSelectedInstanceId(null);
     setSaveState("idle");
   }, []);
 
@@ -449,7 +491,6 @@ export default function EditorPage() {
     ? getComponentDefaults(selectedComponent)
     : {};
 
-  const componentNameById = new Map(components.map((component) => [component.id, component.name]));
 
   return (
     <main style={{ padding: "1rem" }}>
@@ -522,7 +563,20 @@ export default function EditorPage() {
         </aside>
 
         <section style={{ border: "1px solid #ddd", borderRadius: "6px", padding: "0.75rem" }}>
-          <h2 style={{ marginTop: 0 }}>Canvas</h2>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: "0.5rem",
+              marginBottom: "0.75rem"
+            }}
+          >
+            <h2 style={{ margin: 0 }}>Canvas</h2>
+            <button onClick={handleClearCanvas} disabled={doc.instances.length === 0}>
+              Clear Canvas
+            </button>
+          </div>
 
           {doc.instances.length === 0 ? (
             <p>No components added yet.</p>
@@ -572,7 +626,9 @@ export default function EditorPage() {
                       <button onClick={() => handleDuplicateInstance(instance.id)}>
                         Duplicate
                       </button>
-                      <button onClick={() => handleDeleteInstance(instance.id)}>Delete</button>
+                      <button onClick={() => confirmDeleteInstance(instance, index)}>
+                        Delete
+                      </button>
                     </div>
                   </div>
                 </li>
