@@ -1,8 +1,8 @@
 export default function HomePage() {
   return (
-    <main style={{ padding: "2rem" }}>
-      <h1>Email Template Editor</h1>
-      <p>Visit /templates or /editor/example</p>
+    <main className="p-8">
+      <h1 className="text-2xl font-semibold">Email Template Editor</h1>
+      <p className="mt-2 text-slate-700">Visit /templates or /editor/example</p>
     </main>
   );
 }

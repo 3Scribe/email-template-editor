@@ -75,17 +75,9 @@ function SettingField({
   value: unknown;
   onChange: (nextValue: unknown) => void;
 }) {
-  const labelStyle = { display: "block", marginBottom: "0.35rem", fontWeight: 600 };
-  const commonInputStyle = {
-    width: "100%",
-    padding: "0.45rem",
-    border: "1px solid #ccc",
-    borderRadius: "4px"
-  };
-
   if (setting.type === "boolean") {
     return (
-      <label style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+      <label className="flex items-center gap-2">
         <input
           type="checkbox"
           checked={Boolean(value)}
@@ -98,10 +90,10 @@ function SettingField({
 
   if (setting.type === "select") {
     return (
-      <label style={{ display: "block" }}>
-        <span style={labelStyle}>{setting.label}</span>
+      <label className="block">
+        <span className="mb-1 block font-semibold">{setting.label}</span>
         <select
-          style={commonInputStyle}
+          className="w-full rounded border border-slate-300 p-2"
           value={String(value ?? "")}
           onChange={(event) => onChange(event.target.value)}
         >
@@ -117,11 +109,11 @@ function SettingField({
 
   if (setting.type === "number") {
     return (
-      <label style={{ display: "block" }}>
-        <span style={labelStyle}>{setting.label}</span>
+      <label className="block">
+        <span className="mb-1 block font-semibold">{setting.label}</span>
         <input
           type="number"
-          style={commonInputStyle}
+          className="w-full rounded border border-slate-300 p-2"
           value={typeof value === "number" ? value : 0}
           onChange={(event) => {
             const parsed = Number(event.target.value);
@@ -140,11 +132,11 @@ function SettingField({
         : "text";
 
   return (
-    <label style={{ display: "block" }}>
-      <span style={labelStyle}>{setting.label}</span>
+    <label className="block">
+      <span className="mb-1 block font-semibold">{setting.label}</span>
       <input
         type={inputType}
-        style={commonInputStyle}
+        className="w-full rounded border border-slate-300 p-2"
         value={String(value ?? "")}
         onChange={(event) => onChange(event.target.value)}
       />
@@ -470,7 +462,7 @@ export default function EditorPage() {
 
   if (loading) {
     return (
-      <main style={{ padding: "2rem" }}>
+      <main className="p-8">
         <h1>Editor</h1>
         <p>Loading template...</p>
       </main>
@@ -479,7 +471,7 @@ export default function EditorPage() {
 
   if (notFound || !doc) {
     return (
-      <main style={{ padding: "2rem" }}>
+      <main className="p-8">
         <h1>Template not found</h1>
         <p>The requested template does not exist.</p>
         <Link href="/templates">Back to templates</Link>
@@ -493,40 +485,26 @@ export default function EditorPage() {
 
 
   return (
-    <main style={{ padding: "1rem" }}>
-      <header
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: "1rem",
-          marginBottom: "1rem"
-        }}
-      >
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <label style={{ display: "block", marginBottom: "0.25rem", fontWeight: 600 }}>
+    <main className="p-4">
+      <header className="mb-4 flex items-center justify-between gap-4">
+        <div className="min-w-0 flex-1">
+          <label className="mb-1 block font-semibold">
             Template Name
           </label>
           <input
             type="text"
             value={doc.name}
             onChange={(event) => handleNameChange(event.target.value)}
-            style={{
-              width: "100%",
-              maxWidth: "460px",
-              padding: "0.5rem",
-              border: "1px solid #ccc",
-              borderRadius: "4px"
-            }}
+            className="w-full max-w-[460px] rounded border border-slate-300 p-2"
           />
         </div>
 
-        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+        <div className="flex items-center gap-2">
           <button onClick={() => void handleSave()} disabled={saveState === "saving"}>
             {saveState === "saving" ? "Saving..." : "Save"}
           </button>
           <button onClick={handleExport}>Export HTML</button>
-          <span style={{ fontSize: "0.9rem", color: "#444" }}>
+          <span className="text-sm text-slate-700">
             {saveState === "saved" && savedAt
               ? `Saved ${formatSavedAt(savedAt)}`
               : saveState === "error"
@@ -536,24 +514,17 @@ export default function EditorPage() {
         </div>
       </header>
 
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "260px 1fr 320px",
-          gap: "1rem",
-          alignItems: "start"
-        }}
-      >
-        <aside style={{ border: "1px solid #ddd", borderRadius: "6px", padding: "0.75rem" }}>
-          <h2 style={{ marginTop: 0 }}>Components</h2>
-          <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "grid", gap: "0.5rem" }}>
+      <div className="grid items-start gap-4 xl:grid-cols-[260px_1fr_320px]">
+        <aside className="rounded-md border border-slate-300 p-3">
+          <h2 className="mt-0">Components</h2>
+          <ul className="m-0 grid list-none gap-2 p-0">
             {components.map((component) => (
               <li
                 key={component.id}
-                style={{ border: "1px solid #e5e5e5", borderRadius: "4px", padding: "0.5rem" }}
+                className="rounded border border-slate-200 p-2"
               >
                 <strong>{component.name}</strong>
-                <p style={{ margin: "0.35rem 0", fontSize: "0.9rem", color: "#555" }}>
+                <p className="my-1 text-sm text-slate-600">
                   {component.description}
                 </p>
                 <button onClick={() => handleAddComponent(component)}>Add</button>
@@ -562,17 +533,9 @@ export default function EditorPage() {
           </ul>
         </aside>
 
-        <section style={{ border: "1px solid #ddd", borderRadius: "6px", padding: "0.75rem" }}>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              gap: "0.5rem",
-              marginBottom: "0.75rem"
-            }}
-          >
-            <h2 style={{ margin: 0 }}>Canvas</h2>
+        <section className="rounded-md border border-slate-300 p-3">
+          <div className="mb-3 flex items-center justify-between gap-2">
+            <h2 className="m-0">Canvas</h2>
             <button onClick={handleClearCanvas} disabled={doc.instances.length === 0}>
               Clear Canvas
             </button>
@@ -581,45 +544,34 @@ export default function EditorPage() {
           {doc.instances.length === 0 ? (
             <p>No components added yet.</p>
           ) : (
-            <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "grid", gap: "0.5rem" }}>
+            <ul className="m-0 grid list-none gap-2 p-0">
               {doc.instances.map((instance, index) => (
                 <li key={instance.id}>
-                  <div style={{ display: "grid", gap: "0.35rem" }}>
+                  <div className="grid gap-1.5">
                     <button
                       onClick={() => setSelectedInstanceId(instance.id)}
-                      style={{
-                        width: "100%",
-                        textAlign: "left",
-                        padding: "0.5rem",
-                        borderRadius: "4px",
-                        border:
-                          instance.id === selectedInstanceId
-                            ? "2px solid #2563eb"
-                            : "1px solid #d4d4d4",
-                        background:
-                          instance.id === selectedInstanceId ? "#eff6ff" : "#fff"
-                      }}
+                      className={`w-full rounded p-2 text-left ${instance.id === selectedInstanceId ? "border-2 border-blue-600 bg-blue-50" : "border border-slate-300 bg-white"}`}
                     >
-                      <span style={{ display: "block", fontWeight: 600 }}>
+                      <span className="block font-semibold">
                         {index + 1}. {componentNameById.get(instance.componentId) ?? instance.componentId}
                       </span>
-                      <span style={{ display: "block", fontSize: "0.8rem", color: "#555" }}>
+                      <span className="block text-xs text-slate-600">
                         {instance.id}
                       </span>
                     </button>
 
-                    <div style={{ display: "flex", gap: "0.35rem" }}>
+                    <div className="flex gap-1.5">
                       <button
                         onClick={() => handleMoveInstance(instance.id, "up")}
                         disabled={index === 0}
-                        style={{ flex: 1 }}
+                        className="flex-1"
                       >
                         Move Up
                       </button>
                       <button
                         onClick={() => handleMoveInstance(instance.id, "down")}
                         disabled={index === doc.instances.length - 1}
-                        style={{ flex: 1 }}
+                        className="flex-1"
                       >
                         Move Down
                       </button>
@@ -636,35 +588,21 @@ export default function EditorPage() {
             </ul>
           )}
 
-          <div style={{ marginTop: "1rem" }}>
-            <h3 style={{ marginBottom: "0.5rem" }}>Live Preview</h3>
+          <div className="mt-4">
+            <h3 className="mb-2">Live Preview</h3>
             <iframe
               title="Template Preview"
               srcDoc={rendered.html}
-              style={{
-                width: "100%",
-                minHeight: "320px",
-                border: "1px solid #ccc",
-                borderRadius: "4px",
-                background: "#fff"
-              }}
+              className="min-h-[320px] w-full rounded border border-slate-300 bg-white"
             />
           </div>
 
           {rendered.warnings.length > 0 ? (
-            <div
-              style={{
-                marginTop: "1rem",
-                border: "1px solid #f5c2c7",
-                background: "#fff5f5",
-                borderRadius: "4px",
-                padding: "0.75rem"
-              }}
-            >
-              <h3 style={{ marginTop: 0, marginBottom: "0.5rem", color: "#842029" }}>
+            <div className="mt-4 rounded border border-rose-200 bg-rose-50 p-3">
+              <h3 className="mb-2 mt-0 text-rose-900">
                 Renderer Warnings
               </h3>
-              <ul style={{ margin: 0, paddingLeft: "1rem", color: "#842029" }}>
+              <ul className="m-0 list-disc pl-4 text-rose-900">
                 {rendered.warnings.map((warning, index) => (
                   <li key={`${warning}-${index}`}>{warning}</li>
                 ))}
@@ -673,13 +611,13 @@ export default function EditorPage() {
           ) : null}
         </section>
 
-        <aside style={{ border: "1px solid #ddd", borderRadius: "6px", padding: "0.75rem" }}>
-          <h2 style={{ marginTop: 0 }}>Properties</h2>
+        <aside className="rounded-md border border-slate-300 p-3">
+          <h2 className="mt-0">Properties</h2>
           {!selectedInstance || !selectedComponent ? (
             <p>Select a component instance to edit settings.</p>
           ) : (
-            <div style={{ display: "grid", gap: "0.75rem" }}>
-              <p style={{ margin: 0, fontSize: "0.9rem", color: "#555" }}>
+            <div className="grid gap-3">
+              <p className="m-0 text-sm text-slate-600">
                 Editing: <strong>{selectedComponent.name}</strong>
               </p>
 

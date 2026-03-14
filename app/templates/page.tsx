@@ -72,32 +72,32 @@ export default function TemplatesPage() {
   );
 
   return (
-    <main style={{ padding: "2rem" }}>
+    <main className="p-8">
       <h1>Templates</h1>
       <button onClick={() => void handleCreate()} disabled={creating}>
         {creating ? "Creating..." : "New Template"}
       </button>
 
       {templates.length === 0 ? (
-        <p style={{ marginTop: "1rem" }}>No templates yet.</p>
+        <p className="mt-4">No templates yet.</p>
       ) : (
-        <ul style={{ marginTop: "1rem", padding: 0, listStyle: "none", display: "grid", gap: "0.75rem" }}>
+        <ul className="mt-4 grid list-none gap-3 p-0">
           {templates.map((template) => (
             <li
               key={template.id}
-              style={{ border: "1px solid #ddd", borderRadius: "6px", padding: "0.75rem" }}
+              className="rounded-md border border-slate-300 p-3"
             >
-              <p style={{ margin: 0 }}>
+              <p className="m-0">
                 <strong>{template.name}</strong>
               </p>
-              <p style={{ margin: "0.35rem 0", color: "#555", fontSize: "0.9rem" }}>
+              <p className="my-1 text-sm text-slate-600">
                 ID: {template.id}
               </p>
-              <p style={{ margin: 0, color: "#555", fontSize: "0.9rem" }}>
+              <p className="m-0 text-sm text-slate-600">
                 Updated {formatUpdatedAt(template.updatedAt)}
               </p>
 
-              <div style={{ display: "flex", gap: "0.5rem", marginTop: "0.75rem" }}>
+              <div className="mt-3 flex gap-2">
                 <button onClick={() => handleOpen(template.id)}>Open</button>
                 <button
                   onClick={() => void handleDelete(template)}
