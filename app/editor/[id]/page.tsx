@@ -449,6 +449,8 @@ export default function EditorPage() {
     ? getComponentDefaults(selectedComponent)
     : {};
 
+  const componentNameById = new Map(components.map((component) => [component.id, component.name]));
+
   return (
     <main style={{ padding: "1rem" }}>
       <header
@@ -544,7 +546,12 @@ export default function EditorPage() {
                           instance.id === selectedInstanceId ? "#eff6ff" : "#fff"
                       }}
                     >
-                      {instance.componentId} ({instance.id})
+                      <span style={{ display: "block", fontWeight: 600 }}>
+                        {index + 1}. {componentNameById.get(instance.componentId) ?? instance.componentId}
+                      </span>
+                      <span style={{ display: "block", fontSize: "0.8rem", color: "#555" }}>
+                        {instance.id}
+                      </span>
                     </button>
 
                     <div style={{ display: "flex", gap: "0.35rem" }}>
