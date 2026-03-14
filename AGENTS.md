@@ -39,3 +39,29 @@ Before considering work complete:
 3. Confirm there are no obvious TypeScript/runtime errors
 4. Summarize changed files
 5. Provide manual test steps
+
+## Issue Authoring
+
+New issues should follow:
+
+.docs/issue-template.md
+.docs/issue-writing-guide.md
+
+## Issue Format
+
+All issues follow the structure defined in:
+
+.docs/issue-template.md
+
+When implementing an issue:
+- Respect the Acceptance Criteria
+- Do not expand scope beyond what is defined
+
+## Pull Requests
+
+All pull requests must follow the template:
+
+.github/PULL_REQUEST_TEMPLATE.md
+
+PR descriptions must include:
+Closes #<issue-number>

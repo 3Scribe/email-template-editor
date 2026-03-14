@@ -1,21 +1,83 @@
+# Pull Request
+
 ## Summary
 
-<!-- What does this PR do? 1–3 sentences. -->
+Provide a short description of the change.
+
+Explain what functionality was added, changed, or fixed.
+
+---
 
 ## Changes
 
-- <!-- Bullet list of changes -->
+List the key changes introduced in this PR.
+
+Example:
+
+- Added component instance reordering
+- Added Move Up / Move Down controls
+- Updated editor state handling
+- Updated preview rendering after reorder
+
+---
 
 ## Scope
 
-<!-- What is explicitly NOT included? Helps keep PRs tight. -->
+Clarify what areas of the system were intentionally changed.
+
+Example:
+
+Frontend-only change.
+
+No backend changes  
+No database changes  
+No new dependencies introduced
+
+---
 
 ## How to Test
 
-1.
-2.
-3.
+1. Install dependencies
+
+```
+npm install
+```
+
+2. Start the development server
+
+```
+npm run dev
+```
+
+3. Open the application
+
+```
+http://localhost:3000
+```
+
+4. Follow the feature workflow related to this change
+
+Example:
+
+- Create a template
+- Add multiple components
+- Reorder components
+- Verify preview updates
+- Save and refresh
+- Confirm order persists
+
+---
 
 ## Notes
 
-<!-- Anything reviewers should know (follow-ups, tradeoffs, screenshots). -->
+Optional implementation details or constraints.
+
+Example:
+
+Implementation is localized to the editor UI and template instance ordering.
+
+---
+
+## Related Issue
+
+Closes #<issue-number>
