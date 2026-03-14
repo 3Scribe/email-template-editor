@@ -360,6 +360,39 @@ export default function EditorPage() {
     setSaveState("idle");
   }, []);
 
+  const handleDuplicateInstance = useCallback((instanceId: string) => {
+    const nextInstanceId = createInstanceId();
+
+    setDoc((previous) => {
+      if (!previous) {
+        return previous;
+      }
+
+      const index = previous.instances.findIndex((instance) => instance.id === instanceId);
+      if (index < 0) {
+        return previous;
+      }
+
+      const source = previous.instances[index];
+      const duplicate: TemplateInstance = {
+        id: nextInstanceId,
+        componentId: source.componentId,
+        overrides: { ...source.overrides }
+      };
+
+      const nextInstances = [...previous.instances];
+      nextInstances.splice(index + 1, 0, duplicate);
+
+      return {
+        ...previous,
+        instances: nextInstances
+      };
+    });
+
+    setSelectedInstanceId(nextInstanceId);
+    setSaveState("idle");
+  }, []);
+
   const handleSave = useCallback(async () => {
     if (!doc) {
       return;
@@ -528,6 +561,9 @@ export default function EditorPage() {
                         style={{ flex: 1 }}
                       >
                         Move Down
+                      </button>
+                      <button onClick={() => handleDuplicateInstance(instance.id)}>
+                        Duplicate
                       </button>
                       <button onClick={() => handleDeleteInstance(instance.id)}>Delete</button>
                     </div>
