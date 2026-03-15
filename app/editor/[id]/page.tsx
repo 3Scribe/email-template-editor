@@ -15,6 +15,32 @@ import { LocalStorageTemplateStore } from "../../../lib/stores/local-storage-tem
 
 type SaveState = "idle" | "saving" | "saved" | "error";
 
+function toStableJson(value: unknown): string {
+  if (Array.isArray(value)) {
+    return `[${value.map((item) => toStableJson(item)).join(",")}]`;
+  }
+
+  if (value && typeof value === "object") {
+    const record = value as Record<string, unknown>;
+    const keys = Object.keys(record).sort();
+    return `{${keys.map((key) => `${JSON.stringify(key)}:${toStableJson(record[key])}`).join(",")}}`;
+  }
+
+  return JSON.stringify(value);
+}
+
+function getDocSnapshot(doc: TemplateDocument | null): string {
+  if (!doc) {
+    return "";
+  }
+
+  return toStableJson({
+    id: doc.id,
+    name: doc.name,
+    instances: doc.instances
+  });
+}
+
 function createInstanceId(): string {
   return `${Date.now()}-${Math.floor(Math.random() * 1_000_000)}`;
 }
@@ -157,6 +183,7 @@ export default function EditorPage() {
   const [selectedInstanceId, setSelectedInstanceId] = useState<string | null>(null);
   const [saveState, setSaveState] = useState<SaveState>("idle");
   const [savedAt, setSavedAt] = useState<string | null>(null);
+  const [savedSnapshot, setSavedSnapshot] = useState<string>("");
 
   const loadTemplate = useCallback(async () => {
     if (!templateId) {
@@ -178,6 +205,7 @@ export default function EditorPage() {
 
     const normalized = normalizeDoc(loadedDoc);
     setDoc(normalized);
+    setSavedSnapshot(getDocSnapshot(normalized));
     setSelectedInstanceId(normalized.instances[0]?.id ?? null);
     setSaveState("idle");
     setSavedAt(null);
@@ -211,6 +239,11 @@ export default function EditorPage() {
 
     return renderTemplate(doc, components);
   }, [components, doc]);
+
+  const hasUnsavedChanges = useMemo(
+    () => getDocSnapshot(doc) !== savedSnapshot,
+    [doc, savedSnapshot]
+  );
 
   const handleNameChange = useCallback((name: string) => {
     setDoc((previous) => {
@@ -436,6 +469,7 @@ export default function EditorPage() {
     try {
       await store.save(doc);
       const now = new Date().toISOString();
+      setSavedSnapshot(getDocSnapshot(doc));
       setSavedAt(now);
       setSaveState("saved");
     } catch {
@@ -500,13 +534,18 @@ export default function EditorPage() {
         </div>
 
         <div className="flex items-center gap-2">
-          <button onClick={() => void handleSave()} disabled={saveState === "saving"}>
+          <button
+            onClick={() => void handleSave()}
+            disabled={saveState === "saving" || !hasUnsavedChanges}
+          >
             {saveState === "saving" ? "Saving..." : "Save"}
           </button>
           <button onClick={handleExport}>Export HTML</button>
           <span className="text-sm text-slate-700">
-            {saveState === "saved" && savedAt
+            {saveState === "saved" && savedAt && !hasUnsavedChanges
               ? `Saved ${formatSavedAt(savedAt)}`
+              : hasUnsavedChanges
+                ? "Unsaved changes"
               : saveState === "error"
                 ? "Save failed"
                 : ""}
