@@ -546,6 +546,32 @@ export default function EditorPage() {
     }
   }, [doc, store]);
 
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      const isSaveShortcut =
+        (event.metaKey || event.ctrlKey) &&
+        event.key.toLowerCase() === "s";
+
+      if (!isSaveShortcut) {
+        return;
+      }
+
+      event.preventDefault();
+
+      if (!hasUnsavedChanges || saveState === "saving") {
+        return;
+      }
+
+      void handleSave();
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [handleSave, hasUnsavedChanges, saveState]);
+
   const handleExport = useCallback(() => {
     if (!doc) {
       return;
