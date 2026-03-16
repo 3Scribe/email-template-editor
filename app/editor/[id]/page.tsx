@@ -263,6 +263,43 @@ export default function EditorPage() {
     };
   }, [hasUnsavedChanges]);
 
+  useEffect(() => {
+    if (!templateId || !doc || typeof window === "undefined") {
+      return;
+    }
+
+    const guardUrl = window.location.href;
+    const guardState = { __oebUnsavedGuard: true };
+
+    window.history.pushState(guardState, "", guardUrl);
+
+    const handlePopState = () => {
+      if (!hasUnsavedChanges) {
+        window.removeEventListener("popstate", handlePopState);
+        window.history.back();
+        return;
+      }
+
+      const shouldLeave = window.confirm(
+        "You have unsaved changes. Leave the editor without saving?"
+      );
+
+      if (shouldLeave) {
+        window.removeEventListener("popstate", handlePopState);
+        window.history.back();
+        return;
+      }
+
+      window.history.pushState(guardState, "", guardUrl);
+    };
+
+    window.addEventListener("popstate", handlePopState);
+
+    return () => {
+      window.removeEventListener("popstate", handlePopState);
+    };
+  }, [doc, hasUnsavedChanges, templateId]);
+
   const handleNavigateToTemplates = useCallback(() => {
     if (hasUnsavedChanges) {
       const shouldLeave = window.confirm(
