@@ -186,6 +186,14 @@ export default function EditorPage() {
   const [savedAt, setSavedAt] = useState<string | null>(null);
   const [savedSnapshot, setSavedSnapshot] = useState<string>("");
 
+  const saveShortcutLabel = useMemo(() => {
+    if (typeof navigator === "undefined") {
+      return "Ctrl+S";
+    }
+
+    return /Mac|iPhone|iPad|iPod/i.test(navigator.platform) ? "⌘S" : "Ctrl+S";
+  }, []);
+
   const loadTemplate = useCallback(async () => {
     if (!templateId) {
       setNotFound(true);
@@ -635,8 +643,9 @@ export default function EditorPage() {
           <button
             onClick={() => void handleSave()}
             disabled={saveState === "saving" || !hasUnsavedChanges}
+            aria-keyshortcuts="Control+S Meta+S"
           >
-            {saveState === "saving" ? "Saving..." : "Save"}
+            {saveState === "saving" ? "Saving..." : `Save (${saveShortcutLabel})`}
           </button>
           <button onClick={handleExport}>Export HTML</button>
           <span className="text-sm text-slate-700">
