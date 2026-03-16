@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { ComponentStore } from "../../../lib/editor/component-store";
 import type {
@@ -173,6 +173,7 @@ function SettingField({
 export default function EditorPage() {
   const params = useParams<{ id: string | string[] }>();
   const templateId = Array.isArray(params?.id) ? params.id[0] : params?.id;
+  const router = useRouter();
 
   const store = useMemo(() => new LocalStorageTemplateStore(), []);
   const components = useMemo(() => ComponentStore.list(), []);
@@ -244,6 +245,37 @@ export default function EditorPage() {
     () => getDocSnapshot(doc) !== savedSnapshot,
     [doc, savedSnapshot]
   );
+
+  useEffect(() => {
+    if (!hasUnsavedChanges) {
+      return;
+    }
+
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+      event.preventDefault();
+      event.returnValue = "";
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [hasUnsavedChanges]);
+
+  const handleNavigateToTemplates = useCallback(() => {
+    if (hasUnsavedChanges) {
+      const shouldLeave = window.confirm(
+        "You have unsaved changes. Leave the editor without saving?"
+      );
+
+      if (!shouldLeave) {
+        return;
+      }
+    }
+
+    router.push("/templates");
+  }, [hasUnsavedChanges, router]);
 
   const handleNameChange = useCallback((name: string) => {
     setDoc((previous) => {
@@ -522,6 +554,9 @@ export default function EditorPage() {
     <main className="p-4">
       <header className="mb-4 flex items-center justify-between gap-4">
         <div className="min-w-0 flex-1">
+          <button onClick={handleNavigateToTemplates} className="mb-3 text-sm underline">
+            Back to templates
+          </button>
           <label className="mb-1 block font-semibold">
             Template Name
           </label>
